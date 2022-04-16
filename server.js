@@ -1,10 +1,18 @@
 const http = require('http');
 const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 const errHandler = require('./handlers/errHandler');
 const headers = require('./headers/corsHeader');
 const PostModel = require('./models/PostModel');
 
-mongoose.connect('mongodb://localhost:27017/posts')
+// Load env config
+dotenv.config({path: './config.env'});
+
+const uri = process.env.DB_URI.replace(
+  '<password>',
+  process.env.DB_SECRET
+)
+mongoose.connect(uri)
   .then(() => {
     console.log('資料庫連線成功！');
   })
@@ -86,4 +94,4 @@ const reqListener = async (req, res) => {
 }
 
 const server = http.createServer(reqListener);
-server.listen(process.env.PORT || 8080);
+server.listen(process.env.PORT);
