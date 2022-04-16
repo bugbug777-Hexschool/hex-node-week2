@@ -9,6 +9,11 @@ mongoose.connect('mongodb://localhost:27017/posts')
   })
 
 const reqListener = async (req, res) => {
+  let body = '';
+  req.on('data', (chunk) => {
+    body += chunk;
+  })
+
   if (req.url === '/posts' && req.method === 'GET') {
     const posts = await PostModel.find();
     res.writeHead(200, headers);
@@ -17,6 +22,35 @@ const reqListener = async (req, res) => {
       posts: posts
     }))
     res.end();
+  } else if (req.url === '/posts' && req.method === 'POST') {
+    req.on('end', async () => {
+      try {
+        const data = JSON.parse(body);
+        const newPost = await PostModel.create(data);
+        res.writeHead(200, headers);
+        res.write(JSON.stringify({
+          status: 'success',
+          posts: newPost
+        }))
+        res.end();
+      } catch (errors) {
+        if (Object.keys(errors).length === 0) {
+          res.writeHead(400, headers);
+          res.write(JSON.stringify({
+            status: 'false',
+            message: '請檢查資料格式，格式有誤！',
+          }))
+          res.end();
+        } else {
+          res.writeHead(400, headers);
+          res.write(JSON.stringify({
+            status: 'false',
+            message: errors.message,
+          }))
+          res.end();
+        }
+      }
+    })
   } else if (req.method === 'OPTIONS') {
     res.writeHead(200, headers);
     res.end();
