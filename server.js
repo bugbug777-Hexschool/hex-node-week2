@@ -1,5 +1,11 @@
 const http = require('http');
+const mongoose = require('mongoose');
 const headers = require('./headers/corsHeader');
+
+mongoose.connect('mongodb://localhost:27017/posts')
+  .then(() => {
+    console.log('資料庫連線成功！');
+  })
 
 const reqListener = (req, res) => {
   if (req.url === '/posts' && req.method === 'GET') {
