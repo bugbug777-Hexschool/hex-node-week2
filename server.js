@@ -38,6 +38,23 @@ const reqListener = async (req, res) => {
         errHandler(res, 400, errors);
       }
     })
+  } else if (req.url.startsWith('/posts/') && req.method === 'PATCH') {
+    req.on('end', async () => {
+      try {
+        const id = req.url.split('/').pop();
+        const data = JSON.parse(body);
+        const editPost = await PostModel.findByIdAndUpdate(id, data);
+        res.writeHead(200, headers);
+        res.write(JSON.stringify({
+          status: 'success',
+          posts: editPost
+        }))
+        res.end();
+      } catch (errors) {
+        console.log(errors);
+        errHandler(res, 400, errors);
+      }
+    })
   } else if (req.method === 'OPTIONS') {
     res.writeHead(200, headers);
     res.end();
