@@ -1,5 +1,6 @@
 const http = require('http');
 const mongoose = require('mongoose');
+const errHandler = require('./handlers/errHandler');
 const headers = require('./headers/corsHeader');
 const PostModel = require('./models/PostModel');
 
@@ -34,33 +35,14 @@ const reqListener = async (req, res) => {
         }))
         res.end();
       } catch (errors) {
-        if (Object.keys(errors).length === 0) {
-          res.writeHead(400, headers);
-          res.write(JSON.stringify({
-            status: 'false',
-            message: '請檢查資料格式，格式有誤！',
-          }))
-          res.end();
-        } else {
-          res.writeHead(400, headers);
-          res.write(JSON.stringify({
-            status: 'false',
-            message: errors.message,
-          }))
-          res.end();
-        }
+        errHandler(res, 400, errors);
       }
     })
   } else if (req.method === 'OPTIONS') {
     res.writeHead(200, headers);
     res.end();
   } else {
-    res.writeHead(404, headers);
-    res.write(JSON.stringify({
-      status: 'false',
-      message: 'Page is not found.'
-    }))
-    res.end()
+    errHandler(res, 404);
   }
 }
 
