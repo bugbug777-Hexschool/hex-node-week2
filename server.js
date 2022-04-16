@@ -55,6 +55,28 @@ const reqListener = async (req, res) => {
         errHandler(res, 400, errors);
       }
     })
+  } else if (req.url === '/posts' && req.method === 'DELETE') {
+    await PostModel.deleteMany({});
+    res.writeHead(200, headers);
+    res.write(JSON.stringify({
+      status: 'success',
+      posts: []
+    }))
+    res.end();
+  } else if (req.url.startsWith('/posts/') && req.method === 'DELETE') {
+    try {
+      const id = req.url.split('/').pop();
+      const deletedPost = await PostModel.findByIdAndDelete(id);
+      res.writeHead(200, headers);
+      res.write(JSON.stringify({
+        status: 'success',
+        posts: deletedPost
+      }))
+      res.end();
+    } catch (errors) {
+      console.log(errors);
+      errHandler(res, 400, errors);
+    }
   } else if (req.method === 'OPTIONS') {
     res.writeHead(200, headers);
     res.end();
