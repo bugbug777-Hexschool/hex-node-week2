@@ -1,18 +1,20 @@
 const http = require('http');
 const mongoose = require('mongoose');
 const headers = require('./headers/corsHeader');
+const PostModel = require('./models/PostModel');
 
 mongoose.connect('mongodb://localhost:27017/posts')
   .then(() => {
     console.log('資料庫連線成功！');
   })
 
-const reqListener = (req, res) => {
+const reqListener = async (req, res) => {
   if (req.url === '/posts' && req.method === 'GET') {
+    const posts = await PostModel.find();
     res.writeHead(200, headers);
     res.write(JSON.stringify({
       status: 'success',
-      message: 'Get posts data.'
+      posts: posts
     }))
     res.end();
   } else if (req.method === 'OPTIONS') {
