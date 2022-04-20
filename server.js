@@ -52,12 +52,21 @@ const reqListener = async (req, res) => {
         const id = req.url.split('/').pop();
         const data = JSON.parse(body);
         const editPost = await PostModel.findByIdAndUpdate(id, data);
-        res.writeHead(200, headers);
-        res.write(JSON.stringify({
-          status: 'success',
-          posts: editPost
-        }))
-        res.end();
+        if (editPost !== null) {
+          res.writeHead(200, headers);
+          res.write(JSON.stringify({
+            status: 'success',
+            posts: editPost
+          }))
+          res.end();
+        } else {
+          res.writeHead(400, headers);
+          res.write(JSON.stringify({
+            status: 'false',
+            message: '該筆資料不存在'
+          }))
+          res.end();
+        }
       } catch (errors) {
         console.log(errors);
         errHandler(res, 400, errors);
