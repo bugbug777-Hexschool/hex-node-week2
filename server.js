@@ -75,14 +75,22 @@ const reqListener = async (req, res) => {
     try {
       const id = req.url.split('/').pop();
       const deletedPost = await PostModel.findByIdAndDelete(id);
-      res.writeHead(200, headers);
-      res.write(JSON.stringify({
-        status: 'success',
-        posts: deletedPost
-      }))
-      res.end();
+      if (deletedPost !== null) {
+        res.writeHead(200, headers);
+        res.write(JSON.stringify({
+          status: 'success',
+          posts: deletedPost
+        }))
+        res.end();
+      } else {
+        res.writeHead(400, headers);
+        res.write(JSON.stringify({
+          status: 'false',
+          message: '該筆資料不存在'
+        }))
+        res.end();
+      }
     } catch (errors) {
-      console.log(errors);
       errHandler(res, 400, errors);
     }
   } else if (req.method === 'OPTIONS') {
