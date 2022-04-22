@@ -51,19 +51,29 @@ const reqListener = async (req, res) => {
       try {
         const id = req.url.split('/').pop();
         const data = JSON.parse(body);
-        const editPost = await PostModel.findByIdAndUpdate(id, data);
-        if (editPost !== null) {
-          res.writeHead(200, headers);
-          res.write(JSON.stringify({
-            status: 'success',
-            posts: editPost
-          }))
-          res.end();
+
+        if (data.content !== undefined && data.content !== '') {
+          const editPost = await PostModel.findByIdAndUpdate(id, data);
+          if (editPost !== null) {
+            res.writeHead(200, headers);
+            res.write(JSON.stringify({
+              status: 'success',
+              posts: await PostModel.find(editPost._id)
+            }))
+            res.end();
+          } else {
+            res.writeHead(400, headers);
+            res.write(JSON.stringify({
+              status: 'false',
+              message: '該筆資料不存在'
+            }))
+            res.end();
+          }
         } else {
           res.writeHead(400, headers);
           res.write(JSON.stringify({
             status: 'false',
-            message: '該筆資料不存在'
+            message: '貼文內容不能為空！'
           }))
           res.end();
         }
